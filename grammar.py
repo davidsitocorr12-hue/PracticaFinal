@@ -1,26 +1,7 @@
-"""
-grammar.py
-Clase Grammar: representa y parsea una gramática libre de contexto (CFG)
-en formato BNF estándar.
 
-Gramática de referencia (expresiones infijas):
-    G = (N, T, P, E)
-    N = {E, T, F}
-    T = {identifier, número, +, -, *, /, (, )}
-    P:
-        E -> E + T | E - T | T
-        T -> T * F | T / F | F
-        F -> ( E ) | identifier | número
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 class Production:
-    """
-    Representa una producción de la gramática: Cabeza -> [cuerpo1, cuerpo2, ...]
-    Cada 'cuerpo' es una lista de símbolos (terminales o no terminales).
-    """
+   
 
     def __init__(self, head: str, bodies: list[list[str]]):
         self.head = head          # Símbolo del lado izquierdo, ej: "E"
@@ -32,20 +13,7 @@ class Production:
 
 
 class Grammar:
-    """
-    Representa una gramática libre de contexto (CFG).
-
-    Atributos:
-        start_symbol (str): Símbolo inicial de la gramática.
-        productions (dict): Mapeo de no-terminal -> lista de cuerpos (lista de listas).
-        terminals (set): Conjunto de símbolos terminales.
-        non_terminals (set): Conjunto de símbolos no terminales.
-
-    Ejemplo de gramática en formato BNF esperado (la del profe):
-        E -> E + T | E - T | T
-        T -> T * F | T / F | F
-        F -> ( E ) | identifier | número
-    """
+   
 
     def __init__(self):
         self.start_symbol: str = ""
@@ -53,23 +21,9 @@ class Grammar:
         self.terminals: set[str] = set()
         self.non_terminals: set[str] = set()
 
-    # ------------------------------------------------------------------
-    # Parseo
-    # ------------------------------------------------------------------
-
+   
     def parse_from_string(self, text: str) -> None:
-        """
-        Parsea una gramática escrita en formato BNF desde un string.
-
-        Cada línea debe tener el formato:
-            NoTerminal -> simbolo1 simbolo2 | simbolo3 simbolo4
-
-        Args:
-            text: Texto con las reglas de producción.
-
-        Raises:
-            ValueError: Si una línea no sigue el formato esperado.
-        """
+       
         self.productions.clear()
         self.terminals.clear()
         self.non_terminals.clear()
@@ -117,19 +71,14 @@ class Grammar:
         self._infer_terminals()
 
     def _infer_terminals(self) -> None:
-        """
-        Infiere los terminales: todo símbolo que aparece en los cuerpos
-        de las producciones y que NO es un no-terminal.
-        """
+       
         for bodies in self.productions.values():
             for body in bodies:
                 for symbol in body:
                     if symbol not in self.non_terminals:
                         self.terminals.add(symbol)
 
-    # ------------------------------------------------------------------
-    # Consultas
-    # ------------------------------------------------------------------
+  
 
     def is_terminal(self, symbol: str) -> bool:
         return symbol in self.terminals
@@ -138,15 +87,7 @@ class Grammar:
         return symbol in self.non_terminals
 
     def get_productions(self, non_terminal: str) -> list[list[str]]:
-        """
-        Retorna todas las alternativas para un no-terminal dado.
-
-        Args:
-            non_terminal: Símbolo no-terminal.
-
-        Returns:
-            Lista de cuerpos (listas de símbolos), o lista vacía si no existe.
-        """
+       
         return self.productions.get(non_terminal, [])
 
     def get_all_productions(self) -> list[Production]:
@@ -156,10 +97,7 @@ class Grammar:
             for head, bodies in self.productions.items()
         ]
 
-    # ------------------------------------------------------------------
-    # Representación
-    # ------------------------------------------------------------------
-
+   
     def __str__(self) -> str:
         lines = [f"Símbolo inicial: {self.start_symbol}"]
         lines.append(f"No terminales: {', '.join(sorted(self.non_terminals))}")
@@ -173,10 +111,6 @@ class Grammar:
     def __repr__(self) -> str:
         return f"Grammar(start='{self.start_symbol}', rules={len(self.productions)})"
 
-
-# ------------------------------------------------------------------
-# Prueba rápida (ejecuta: python grammar.py)
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     # Gramática del profe: expresiones infijas
     texto_gramatica = """
