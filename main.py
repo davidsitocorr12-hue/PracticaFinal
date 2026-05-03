@@ -1,16 +1,3 @@
-"""
-main.py
-Punto de entrada de la aplicación.
-
-Cómo correr:
-    python main.py
-
-Requisitos:
-    pip install nltk matplotlib
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 import sys
 import nltk
