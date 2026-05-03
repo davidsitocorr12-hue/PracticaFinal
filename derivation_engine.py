@@ -1,10 +1,3 @@
-"""
-derivation_engine.py
-Clase DerivationEngine: derivaciones izquierda y derecha usando NLTK ChartParser.
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 import nltk
 from nltk import CFG, ChartParser
@@ -29,28 +22,14 @@ class DerivationStep:
 
 
 class DerivationEngine:
-    """
-    Motor de derivación izquierda y derecha para gramáticas CFG.
-
-    Usa NLTK ChartParser para obtener el árbol de parseo y luego
-    recorre ese árbol para reconstruir los pasos de derivación.
-
-    Algoritmo:
-      - Derivación IZQUIERDA: preorden del árbol (raíz → hijos izq→der).
-        Siempre se busca y expande el no-terminal más a la IZQUIERDA.
-      - Derivación DERECHA: preorden con hijos der→izq (right-first preorder).
-        Siempre se busca y expande el no-terminal más a la DERECHA.
-    """
+   
 
     def __init__(self, grammar: Grammar):
         self.grammar = grammar
         self._nltk_grammar = self._build_nltk_grammar(grammar)
         self._parser = ChartParser(self._nltk_grammar)
 
-    # ------------------------------------------------------------------
-    # Construcción gramática NLTK
-    # ------------------------------------------------------------------
-
+   
     def _build_nltk_grammar(self, grammar: Grammar) -> CFG:
         """Convierte nuestro Grammar al formato CFG de NLTK."""
         lines = []
@@ -66,56 +45,22 @@ class DerivationEngine:
                 lines.append(f"{nt} -> {rhs}")
         return CFG.fromstring("\n".join(lines))
 
-    # ------------------------------------------------------------------
-    # API pública
-    # ------------------------------------------------------------------
 
     def derive_left(self, target_tokens: list) -> list:
-        """
-        Derivación más a la izquierda (leftmost derivation).
-
-        En cada paso se expande el no-terminal más a la izquierda
-        de la forma sentencial actual.
-
-        Args:
-            target_tokens: Lista de tokens terminales de la expresión.
-                           Ej: ["identifier", "+", "identifier"]
-
-        Returns:
-            Lista de DerivationStep, uno por cada expansión realizada.
-
-        Raises:
-            ValueError: Si la expresión no pertenece al lenguaje de la gramática.
-        """
+       
         tree = self._parse_tree(target_tokens)
         productions = []
         self._preorder(tree, productions)
         return self._simulate(productions, leftmost=True)
 
     def derive_right(self, target_tokens: list) -> list:
-        """
-        Derivación más a la derecha (rightmost derivation).
-
-        En cada paso se expande el no-terminal más a la derecha
-        de la forma sentencial actual.
-
-        Args:
-            target_tokens: Lista de tokens terminales de la expresión.
-
-        Returns:
-            Lista de DerivationStep, uno por cada expansión realizada.
-
-        Raises:
-            ValueError: Si la expresión no pertenece al lenguaje de la gramática.
-        """
+        
         tree = self._parse_tree(target_tokens)
         productions = []
         self._right_first_preorder(tree, productions)
         return self._simulate(productions, leftmost=False)
 
-    # ------------------------------------------------------------------
-    # Parseo NLTK
-    # ------------------------------------------------------------------
+  
 
     def _parse_tree(self, tokens: list):
         """Obtiene el primer árbol de parseo válido con NLTK ChartParser."""
@@ -133,15 +78,8 @@ class DerivationEngine:
             )
         return trees[0]
 
-    # ------------------------------------------------------------------
-    # Recorridos del árbol
-    # ------------------------------------------------------------------
-
     def _preorder(self, node, result: list):
-        """
-        Preorden izquierda→derecha: raíz, luego hijos de izq a der.
-        Produce el orden de expansión para derivación izquierda.
-        """
+       
         if not isinstance(node, nltk.Tree):
             return
         head = node.label()
@@ -154,10 +92,7 @@ class DerivationEngine:
             self._preorder(child, result)
 
     def _right_first_preorder(self, node, result: list):
-        """
-        Preorden derecha→izquierda: raíz, luego hijos de der a izq.
-        Produce el orden de expansión para derivación derecha.
-        """
+       
         if not isinstance(node, nltk.Tree):
             return
         head = node.label()
@@ -169,23 +104,9 @@ class DerivationEngine:
         for child in reversed(list(node)):
             self._right_first_preorder(child, result)
 
-    # ------------------------------------------------------------------
-    # Simulación de la derivación
-    # ------------------------------------------------------------------
-
+  
     def _simulate(self, productions: list, leftmost: bool) -> list:
-        """
-        Aplica la secuencia de producciones sobre la forma sentencial
-        inicial (símbolo de inicio) y genera los pasos de derivación.
-
-        Args:
-            productions: Lista de (cabeza, cuerpo) en el orden del recorrido.
-            leftmost: True → busca el no-terminal más a la izquierda.
-                      False → busca el no-terminal más a la derecha.
-
-        Returns:
-            Lista de DerivationStep.
-        """
+        
         current = [self.grammar.start_symbol]
         steps = []
 
@@ -219,33 +140,15 @@ class DerivationEngine:
 
         return steps
 
-    # ------------------------------------------------------------------
-    # Formateo
-    # ------------------------------------------------------------------
-
+   
     def format_derivation(self, steps: list, start_symbol: str = None) -> str:
-        """
-        Formatea los pasos como texto legible con flechas '=>'.
-
-        Ejemplo de salida:
-            E
-            => E + T
-            => T + T
-            => F + T
-            => identifier + T
-            => identifier + F
-            => identifier + identifier
-        """
+        
         start = start_symbol or self.grammar.start_symbol
         lines = [start]
         for step in steps:
             lines.append(step.to_arrow_str())
         return "\n".join(lines)
 
-
-# ------------------------------------------------------------------
-# Prueba rápida (ejecuta: python derivation_engine.py)
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     from grammar import Grammar
 
