@@ -1,11 +1,3 @@
-"""
-parse_tree_builder.py
-Clase ParseTreeBuilder: construye y visualiza el árbol de derivación (parse tree)
-a partir del árbol NLTK obtenido por el ChartParser.
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 import nltk
 from nltk import CFG, ChartParser
@@ -13,15 +5,7 @@ from grammar import Grammar
 
 
 class TreeNode:
-    """
-    Nodo del árbol de derivación.
-
-    Atributos:
-        symbol   (str):        Símbolo que representa este nodo (terminal o no-terminal).
-        children (list):       Lista de TreeNode hijos.
-        is_terminal (bool):    True si el nodo es un símbolo terminal.
-    """
-
+   
     def __init__(self, symbol: str, is_terminal: bool = False):
         self.symbol = symbol
         self.children: list["TreeNode"] = []
@@ -38,29 +22,14 @@ class TreeNode:
 
 
 class ParseTreeBuilder:
-    """
-    Construye el árbol de derivación (parse tree) para una expresión dada.
 
-    Usa NLTK ChartParser internamente para obtener el árbol de parseo,
-    y lo convierte a nuestra estructura propia de TreeNode para poder
-    dibujarlo y manipularlo independientemente de NLTK.
-
-    Uso:
-        builder = ParseTreeBuilder(grammar)
-        root    = builder.build(["identifier", "+", "identifier"])
-        text    = builder.to_text(root)
-        print(text)
-    """
 
     def __init__(self, grammar: Grammar):
         self.grammar = grammar
         self._nltk_grammar = self._build_nltk_grammar(grammar)
         self._parser = ChartParser(self._nltk_grammar)
 
-    # ------------------------------------------------------------------
-    # Construcción de la gramática NLTK
-    # ------------------------------------------------------------------
-
+    
     def _build_nltk_grammar(self, grammar: Grammar) -> CFG:
         """Convierte nuestro Grammar al formato CFG de NLTK."""
         lines = []
@@ -76,9 +45,7 @@ class ParseTreeBuilder:
                 lines.append(f"{nt} -> {rhs}")
         return CFG.fromstring("\n".join(lines))
 
-    # ------------------------------------------------------------------
-    # API pública
-    # ------------------------------------------------------------------
+   
 
     def build(self, tokens: list) -> TreeNode:
         """
@@ -96,10 +63,6 @@ class ParseTreeBuilder:
         nltk_tree = self._get_nltk_tree(tokens)
         return self._convert(nltk_tree)
 
-    # ------------------------------------------------------------------
-    # Parseo NLTK
-    # ------------------------------------------------------------------
-
     def _get_nltk_tree(self, tokens: list):
         """Obtiene el primer árbol de parseo de NLTK ChartParser."""
         try:
@@ -114,20 +77,10 @@ class ParseTreeBuilder:
             )
         return trees[0]
 
-    # ------------------------------------------------------------------
-    # Conversión NLTK Tree → nuestro TreeNode
-    # ------------------------------------------------------------------
+  
 
     def _convert(self, nltk_node) -> TreeNode:
-        """
-        Convierte recursivamente un nodo de nltk.Tree a nuestro TreeNode.
 
-        Args:
-            nltk_node: Nodo de árbol NLTK (nltk.Tree) o terminal (str).
-
-        Returns:
-            TreeNode equivalente con todos sus hijos.
-        """
         if isinstance(nltk_node, nltk.Tree):
             node = TreeNode(
                 symbol=nltk_node.label(),
@@ -140,33 +93,10 @@ class ParseTreeBuilder:
             # Es una hoja terminal (string)
             return TreeNode(symbol=str(nltk_node), is_terminal=True)
 
-    # ------------------------------------------------------------------
-    # Visualización en texto (para consola o GUI de texto)
-    # ------------------------------------------------------------------
+    
 
     def to_text(self, node: TreeNode, prefix: str = "", is_last: bool = True) -> str:
-        """
-        Genera una representación visual del árbol en texto (estilo árbol de directorio).
-
-        Ejemplo para identifier + identifier:
-            E
-            ├── E
-            │   └── T
-            │       └── F
-            │           └── identifier
-            ├── +
-            └── T
-                └── F
-                    └── identifier
-
-        Args:
-            node:    Nodo raíz del árbol.
-            prefix:  Prefijo acumulado para la sangría (uso interno).
-            is_last: Si este nodo es el último hijo de su padre (uso interno).
-
-        Returns:
-            String con el árbol dibujado.
-        """
+       
         connector = "└── " if is_last else "├── "
         line = prefix + (connector if prefix else "") + node.symbol + "\n"
 
@@ -178,26 +108,12 @@ class ParseTreeBuilder:
         return line
 
     def to_bracket_notation(self, node: TreeNode) -> str:
-        """
-        Genera la notación de corchetes del árbol.
-        Útil para pasarla a otras herramientas de visualización.
-
-        Ejemplo: [E [E [T [F identifier]]] + [T [F identifier]]]
-
-        Args:
-            node: Nodo raíz.
-
-        Returns:
-            String en notación de corchetes.
-        """
+       
         if node.is_leaf():
             return node.symbol
         children_str = " ".join(self.to_bracket_notation(c) for c in node.children)
         return f"[{node.symbol} {children_str}]"
 
-    # ------------------------------------------------------------------
-    # Estadísticas del árbol
-    # ------------------------------------------------------------------
 
     def height(self, node: TreeNode) -> int:
         """Calcula la altura del árbol."""
@@ -218,10 +134,6 @@ class ParseTreeBuilder:
             leaves.extend(self.get_leaves(child))
         return leaves
 
-
-# ------------------------------------------------------------------
-# Prueba rápida (ejecuta: python parse_tree_builder.py)
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     from grammar import Grammar
 
