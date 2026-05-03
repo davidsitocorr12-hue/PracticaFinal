@@ -1,31 +1,10 @@
-"""
-ast_builder.py
-Clase ASTBuilder: genera el Árbol de Sintaxis Abstracta (AST) a partir
-del árbol de derivación, eliminando nodos redundantes y no esenciales.
 
-Reglas de simplificación aplicadas:
-  1. Nodos con un solo hijo no-terminal → se colapsan (se elimina el nodo intermedio).
-  2. Paréntesis y otros símbolos de puntuación → se eliminan.
-  3. Los operadores (+, -, *, /) se convierten en nodos internos del AST.
-  4. Los operandos (identifier, número) se convierten en hojas del AST.
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 from parse_tree_builder import TreeNode
 
 
 class ASTNode:
-    """
-    Nodo del Árbol de Sintaxis Abstracta (AST).
-
-    Atributos:
-        value    (str):  Valor del nodo (operador u operando).
-        children (list): Lista de ASTNode hijos.
-        node_type (str): 'operator' | 'operand' | 'identifier' | 'número'
-    """
-
+  
     def __init__(self, value: str, node_type: str = "operand"):
         self.value = value
         self.node_type = node_type
@@ -42,21 +21,7 @@ class ASTNode:
 
 
 class ASTBuilder:
-    """
-    Construye el AST a partir del árbol de derivación (TreeNode).
-
-    El AST es una versión simplificada del árbol de derivación que:
-      - Elimina los nodos gramaticales intermedios redundantes (E, T, F
-        cuando solo tienen un hijo no-terminal).
-      - Elimina los paréntesis y otros delimitadores.
-      - Usa los operadores como nodos raíz de cada subexpresión.
-      - Conserva solo los nodos semánticamente relevantes.
-
-    Uso:
-        ast_builder = ASTBuilder(grammar)
-        ast_root    = ast_builder.build(parse_tree_root)
-        print(ast_builder.to_text(ast_root))
-    """
+  
 
     # Símbolos que se eliminan del AST (no aportan semántica)
     PUNCTUATION = {"(", ")", ",", ";"}
@@ -67,42 +32,14 @@ class ASTBuilder:
     def __init__(self, grammar):
         self.grammar = grammar
 
-    # ------------------------------------------------------------------
-    # API pública
-    # ------------------------------------------------------------------
-
+   
     def build(self, parse_tree_root: TreeNode) -> ASTNode:
-        """
-        Genera el AST a partir del nodo raíz del árbol de derivación.
-
-        Args:
-            parse_tree_root: Raíz del árbol de derivación (TreeNode).
-
-        Returns:
-            Nodo raíz del AST (ASTNode).
-        """
+       
         return self._simplify(parse_tree_root)
 
-    # ------------------------------------------------------------------
-    # Motor de simplificación
-    # ------------------------------------------------------------------
-
+  
     def _simplify(self, node: TreeNode) -> ASTNode | None:
-        """
-        Simplifica recursivamente un TreeNode en un ASTNode.
-
-        Reglas:
-          - Terminal de puntuación → se descarta (retorna None).
-          - Terminal operando/operador → se convierte directamente.
-          - No-terminal con un solo hijo no-terminal relevante → se colapsa.
-          - No-terminal con operador binario (A op B) → nodo operador con dos hijos.
-
-        Args:
-            node: Nodo del árbol de derivación a simplificar.
-
-        Returns:
-            ASTNode resultante, o None si el nodo debe descartarse.
-        """
+      
         # -- Caso hoja terminal --
         if node.is_leaf():
             return self._handle_terminal(node)
@@ -153,15 +90,7 @@ class ASTBuilder:
         return None
 
     def _handle_terminal(self, node: TreeNode) -> ASTNode | None:
-        """
-        Convierte un nodo terminal del árbol de derivación en un ASTNode.
-
-        Args:
-            node: TreeNode terminal (hoja).
-
-        Returns:
-            ASTNode correspondiente, o None si debe descartarse.
-        """
+      
         sym = node.symbol
 
         if sym in self.PUNCTUATION:
@@ -179,27 +108,9 @@ class ASTBuilder:
         # Cualquier otro terminal
         return ASTNode(value=sym, node_type="terminal")
 
-    # ------------------------------------------------------------------
-    # Visualización en texto
-    # ------------------------------------------------------------------
 
     def to_text(self, node: ASTNode, prefix: str = "", is_last: bool = True) -> str:
-        """
-        Genera una representación visual del AST en texto.
-
-        Ejemplo para identifier + identifier:
-            +
-            ├── identifier
-            └── identifier
-
-        Args:
-            node:    Nodo raíz del AST.
-            prefix:  Prefijo acumulado (uso interno).
-            is_last: Si este nodo es el último hijo (uso interno).
-
-        Returns:
-            String con el AST dibujado.
-        """
+    
         connector = "└── " if is_last else "├── "
         label = f"{node.value}  [{node.node_type}]" if node.node_type == "operator" else node.value
         line = prefix + (connector if prefix else "") + label + "\n"
@@ -212,18 +123,11 @@ class ASTBuilder:
         return line
 
     def to_bracket_notation(self, node: ASTNode) -> str:
-        """
-        Notación de corchetes del AST.
-        Ejemplo: [+ [identifier] [identifier]]
-        """
+       
         if node.is_leaf():
             return node.value
         children_str = " ".join(self.to_bracket_notation(c) for c in node.children)
         return f"[{node.value} {children_str}]"
-
-    # ------------------------------------------------------------------
-    # Estadísticas
-    # ------------------------------------------------------------------
 
     def height(self, node: ASTNode) -> int:
         """Altura del AST."""
@@ -253,10 +157,6 @@ class ASTBuilder:
             result.extend(self.get_operands(child))
         return result
 
-
-# ------------------------------------------------------------------
-# Prueba rápida (ejecuta: python ast_builder.py)
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     from grammar import Grammar
     from parse_tree_builder import ParseTreeBuilder
