@@ -1,18 +1,4 @@
-"""
-main_window.py
-Clase MainWindow: interfaz gráfica principal del generador de árboles sintácticos.
 
-Integra los módulos:
-  - Grammar          → parsea las reglas BNF
-  - DerivationEngine → genera derivación izquierda / derecha
-  - ParseTreeBuilder → construye el árbol de derivación
-  - ASTBuilder       → simplifica el árbol en un AST
-
-Tecnología: tkinter + matplotlib (embebido en tkinter) + NLTK
-
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
@@ -28,33 +14,16 @@ from ast_builder import ASTBuilder, ASTNode
 from lexer import Lexer, LexerError
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Utilidad: dibujador de árboles con matplotlib
-# ──────────────────────────────────────────────────────────────────────────────
 
 class TreeDrawer:
-    """
-    Dibuja un árbol (TreeNode o ASTNode) sobre un Axes de matplotlib.
-
-    Calcula posiciones con un layout de árbol binario generalizado:
-      - Asigna a cada hoja una posición x equidistante.
-      - Los nodos internos se centran sobre sus hijos.
-      - El nivel y es proporcional a la profundidad.
-    """
+ 
 
     NODE_RADIUS = 0.35
     LEVEL_HEIGHT = 1.4
     FONT_SIZE = 9
 
     def draw(self, ax, root, is_ast: bool = False) -> None:
-        """
-        Dibuja el árbol en el Axes dado.
-
-        Args:
-            ax:     Axes de matplotlib donde se dibuja.
-            root:   Nodo raíz (TreeNode o ASTNode).
-            is_ast: True si es un AST (usa colores distintos).
-        """
+       
         ax.clear()
         ax.set_aspect("equal")
         ax.axis("off")
@@ -78,14 +47,7 @@ class TreeDrawer:
         self._draw_nodes(ax, root, positions, is_ast)
 
     def _assign_positions(self, node, positions: dict, depth: int, counter: list) -> float:
-        """
-        Asigna coordenadas (x, y) a cada nodo.
-        Las hojas obtienen posiciones x consecutivas; los nodos internos
-        se centran sobre el rango de sus hijos.
-
-        Returns:
-            Centro x del subárbol de este nodo.
-        """
+       
         children = self._get_children(node)
 
         if not children:
@@ -151,9 +113,6 @@ class TreeDrawer:
         for child in self._get_children(node):
             self._draw_nodes(ax, child, positions, is_ast)
 
-    # ------------------------------------------------------------------
-    # Helpers polimórficos (funcionan con TreeNode y ASTNode)
-    # ------------------------------------------------------------------
 
     def _get_children(self, node) -> list:
         return node.children if hasattr(node, "children") else []
@@ -167,24 +126,9 @@ class TreeDrawer:
         return str(node), True, False
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Ventana principal
-# ──────────────────────────────────────────────────────────────────────────────
 
 class MainWindow:
-    """
-    Ventana principal de la aplicación.
-
-    Layout:
-    ┌─────────────────────────────────────────────────────┐
-    │  Panel izquierdo         │  Panel derecho (árboles) │
-    │  ├─ Gramática (textarea) │  ├─ Árbol de derivación  │
-    │  ├─ Expresión (entry)    │  └─ AST                  │
-    │  ├─ Opciones derivación  │                          │
-    │  ├─ Botón Generar        │                          │
-    │  └─ Derivación (texto)   │                          │
-    └─────────────────────────────────────────────────────┘
-    """
+   
 
     GRAMMAR_DEFAULT = (
         "E -> E + T | E - T | T\n"
@@ -210,9 +154,7 @@ class MainWindow:
         self._build_ui()
         self._apply_styles()
 
-    # ------------------------------------------------------------------
-    # Construcción de la UI
-    # ------------------------------------------------------------------
+ 
 
     def _build_ui(self) -> None:
         """Construye todos los widgets de la ventana."""
@@ -354,10 +296,6 @@ class MainWindow:
                  bg="#F5F6FA", font=("Helvetica", 8),
                  fg="#666666").pack()
 
-    # ------------------------------------------------------------------
-    # Estilos
-    # ------------------------------------------------------------------
-
     def _apply_styles(self) -> None:
         """Aplica colores y estilos a los widgets."""
         self.btn_generate.configure(bg="#2563EB", fg="white",
@@ -370,15 +308,9 @@ class MainWindow:
         style.configure("TNotebook", background="#F5F6FA")
         style.configure("TNotebook.Tab", font=("Helvetica", 10, "bold"), padding=[10, 4])
 
-    # ------------------------------------------------------------------
-    # Lógica principal: evento Generar
-    # ------------------------------------------------------------------
-
+   
     def _on_generate(self) -> None:
-        """
-        Manejador del botón 'Generar Derivación'.
-        Coordina todos los módulos del dominio y actualiza la UI.
-        """
+     
         grammar_text = self.grammar_text.get("1.0", tk.END).strip()
         expression_text = self.expr_entry.get().strip()
         direction = self.derivation_var.get()
@@ -457,21 +389,9 @@ class MainWindow:
         except Exception as e:
             self._show_empty_plot(self.ax_ast, self.canvas_ast, f"Error: {e}")
 
-    # ------------------------------------------------------------------
-    # Helpers de UI
-    # ------------------------------------------------------------------
-
+   
     def _replace_leaves(self, node, descripciones: list) -> None:
-        """
-        Recorre el árbol de derivación en orden izquierda→derecha y reemplaza
-        las hojas 'número' e 'identifier' por los valores reales del usuario.
-
-        Por ejemplo: hoja 'número' → '5', hoja 'identifier' → 'x'
-
-        Args:
-            node:         Nodo raíz del árbol (TreeNode).
-            descripciones: Lista de descripciones del lexer, ej ["5→número", "+", "x→identifier"]
-        """
+       
         # Extraer valores reales en orden de aparición
         nums = [d.split("→")[0] for d in descripciones if "→número" in d]
         ids  = [d.split("→")[0] for d in descripciones if "→identifier" in d]
@@ -495,16 +415,7 @@ class MainWindow:
     def _format_derivation_real(
         self, steps, start_symbol: str, descripciones: list, expression_text: str
     ) -> str:
-        """
-        Formatea la derivación reemplazando 'número' e 'identifier'
-        por los valores reales que el usuario escribió.
-
-        Por ejemplo, si el usuario escribió "5 + 2 * x":
-          número → 5, número → 2, identifier → x
-
-        Cada aparición de número/identifier se reemplaza en orden
-        de izquierda a derecha, respetando el orden de los tokens.
-        """
+      
         # Extraer valores reales en orden: "5→número" → "5", "x→identifier" → "x"
         real_values = []
         for d in descripciones:
@@ -562,18 +473,9 @@ class MainWindow:
         )
         canvas.draw()
 
-    # ------------------------------------------------------------------
-    # Arranque
-    # ------------------------------------------------------------------
-
     def run(self) -> None:
         """Inicia el loop principal de tkinter."""
         self.root.mainloop()
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Punto de entrada
-# ──────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     app = MainWindow()
