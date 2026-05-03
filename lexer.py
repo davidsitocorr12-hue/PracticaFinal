@@ -1,11 +1,4 @@
-"""
-lexer.py
-Clase Lexer: convierte una expresión real como "5 + 2 * x"
-en tokens que la gramática entiende: ["número", "+", "número", "*", "identifier"]
 
-Autor: [Tu nombre]
-Curso: ST0244 - Lenguajes de Programación y Paradigmas de Computación
-"""
 
 import re
 
@@ -27,26 +20,7 @@ class Token:
 
 
 class Lexer:
-    """
-    Tokenizador de expresiones infijas.
-
-    Convierte una expresión escrita por el usuario en una lista de
-    tokens que la gramática CFG puede procesar.
-
-    Reglas de conversión:
-      - Números (enteros o decimales) → "número"
-      - Identificadores (letras/palabras) → "identifier"
-      - Operadores +, -, *, /  → se quedan igual
-      - Paréntesis ( )         → se quedan igual
-      - Espacios               → se ignoran
-
-    Uso:
-        lexer = Lexer()
-        tokens, descripciones = lexer.tokenize("5 + 2 * x")
-        # tokens = ["número", "+", "número", "*", "identifier"]
-        # descripciones = ["5→número", "+", "2→número", "*", "x→identifier"]
-    """
-
+   
     # Patrones en orden de prioridad
     TOKEN_PATTERNS = [
         ("número",     r'\d+(\.\d+)?'),       # 5, 3.14, 100
@@ -62,22 +36,7 @@ class Lexer:
         self._regex = re.compile('|'.join(parts))
 
     def tokenize(self, expression: str) -> tuple[list[str], list[str]]:
-        """
-        Convierte una expresión real en tokens para la gramática.
-
-        Args:
-            expression: Expresión como "5 + 2 * x" o "( a - b ) * c"
-
-        Returns:
-            Tupla de (tokens, descripciones):
-              - tokens: lista de strings para la gramática
-                        ej. ["número", "+", "número", "*", "identifier"]
-              - descripciones: lista legible mostrando la conversión
-                        ej. ["5→número", "+", "2→número", "*", "x→identifier"]
-
-        Raises:
-            LexerError: Si hay un símbolo no reconocido.
-        """
+      
         if not expression.strip():
             raise LexerError("La expresión está vacía.")
 
@@ -131,9 +90,6 @@ class Lexer:
         return " ".join(tokens)
 
 
-# ------------------------------------------------------------------
-# Prueba rápida
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     lexer = Lexer()
 
